@@ -30,10 +30,10 @@
     hash : <Md5, Sha1, Sha256, Sha512> -> Str -> Str =
       fun type s => %hash% type s,
 
-    serialize : <Json, Toml, Yaml> -> Dyn -> Str = fun format x =>
+    serialize : <Json, Toml, Yaml, Xml> -> Dyn -> Str = fun format x =>
       %serialize% format (%deepSeq% x x),
 
-    deserialize : <Json, Toml, Yaml> -> Str -> Dyn = fun format x =>
+    deserialize : <Json, Toml, Yaml, Xml> -> Str -> Dyn = fun format x =>
       %deserialize% format x,
   }
 }

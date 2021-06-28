@@ -5,7 +5,8 @@ let assertSerInv = fun x =>
       %deserialize% format (%serialize% format (%deepSeq% x x)) == x in
     assertAux `Json x &&
     assertAux `Yaml x &&
-    assertAux `Toml x in
+    assertAux `Toml x &&
+    assertAux `Xml x in
 
 let assertDeserInv = fun x =>
     let assertAux = fun format x =>
@@ -13,7 +14,8 @@ let assertDeserInv = fun x =>
       %serialize% format (%deserialize% format s) == s in
     assertAux `Json x &&
     assertAux `Yaml x &&
-    assertAux `Toml x in
+    assertAux `Toml x &&
+    assertAux `Xml x in
 
 (assertSerInv {val = 1 + 1} | #Assert) &&
 (assertSerInv {val = "Some string"} | #Assert) &&

@@ -1798,18 +1798,18 @@ pub fn get_bop_type(
             mk_typewrapper::str(),
             mk_typewrapper::str(),
         ),
-        // forall a. <Json, Yaml, Toml> -> a -> Str
+        // forall a. <Json, Yaml, Toml, Xml> -> a -> Str
         BinaryOp::Serialize() => {
             let ty_input = TypeWrapper::Ptr(new_var(state.table));
             (
-                mk_tyw_enum!("Json", "Yaml", "Toml", mk_typewrapper::row_empty()),
+                mk_tyw_enum!("Json", "Yaml", "Toml", "Xml", mk_typewrapper::row_empty()),
                 ty_input,
                 mk_typewrapper::str(),
             )
         }
-        // <Json, Yaml, Toml> -> Str -> Dyn
+        // <Json, Yaml, Toml, Xml> -> Str -> Dyn
         BinaryOp::Deserialize() => (
-            mk_tyw_enum!("Json", "Yaml", "Toml", mk_typewrapper::row_empty()),
+            mk_tyw_enum!("Json", "Yaml", "Toml", "Xml", mk_typewrapper::row_empty()),
             mk_typewrapper::str(),
             mk_typewrapper::dynamic(),
         ),

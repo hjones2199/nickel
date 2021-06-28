@@ -4,6 +4,7 @@ use crate::identifier::Ident;
 use crate::term::{MetaValue, RichTerm, Term};
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Error, Serialize, SerializeMap, Serializer};
+use serde_xml_rs;
 use std::collections::HashMap;
 use std::fmt;
 use std::io;
@@ -16,6 +17,7 @@ pub enum ExportFormat {
     Json,
     Yaml,
     Toml,
+    Xml,
 }
 
 impl std::default::Default for ExportFormat {
@@ -31,6 +33,7 @@ impl fmt::Display for ExportFormat {
             Self::Json => write!(f, "json"),
             Self::Yaml => write!(f, "yaml"),
             Self::Toml => write!(f, "toml"),
+            Self::Xml => write!(f, "xml"),
         }
     }
 }
@@ -53,6 +56,7 @@ impl FromStr for ExportFormat {
             "json" => Ok(ExportFormat::Json),
             "yaml" => Ok(ExportFormat::Yaml),
             "toml" => Ok(ExportFormat::Toml),
+            "xml" => Ok(ExportFormat::Xml),
             _ => Err(ParseFormatError(String::from(s))),
         }
     }
@@ -180,6 +184,8 @@ where
             .and_then(|v| {
                 write!(writer, "{}", v).map_err(|err| SerializationError::Other(err.to_string()))
             }),
+        ExportFormat::Xml => serde_xml_rs::to_writer(writer, &rt)
+            .map_err(|err| SerializationError::Other(err.to_string())),
         ExportFormat::Raw => match rt.as_ref() {
             Term::Str(s) => writer
                 .write_all(s.as_bytes())
@@ -202,6 +208,9 @@ pub fn to_string(format: ExportFormat, rt: &RichTerm) -> Result<String, Serializ
         ExportFormat::Toml => toml::Value::try_from(&rt)
             .map(|v| format!("{}", v))
             .map_err(|err| SerializationError::Other(err.to_string())),
+        ExportFormat::Xml => {
+            serde_xml_rs::to_string(&rt).map_err(|err| SerializationError::Other(err.to_string()))
+        }
         ExportFormat::Raw => match rt.as_ref() {
             Term::Str(s) => Ok(s.clone()),
             t => Err(SerializationError::Other(format!(

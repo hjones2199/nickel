@@ -1805,7 +1805,7 @@ fn process_binary_operation(
         BinaryOp::Serialize() => {
             let mk_err_fst = |t1| {
                 Err(EvalError::TypeError(
-                    String::from("Enum <Json, Yaml, Toml>"),
+                    String::from("Enum <Json, Yaml, Toml, Xml>"),
                     String::from("serialize, 1st argument"),
                     fst_pos,
                     RichTerm {
@@ -1831,6 +1831,7 @@ fn process_binary_operation(
                     "Json" => ExportFormat::Json,
                     "Yaml" => ExportFormat::Yaml,
                     "Toml" => ExportFormat::Toml,
+                    "Xml" => ExportFormat::Xml,
                     _ => return mk_err_fst(t1),
                 };
 
@@ -1846,7 +1847,7 @@ fn process_binary_operation(
         BinaryOp::Deserialize() => {
             let mk_err_fst = |t1| {
                 Err(EvalError::TypeError(
-                    String::from("Enum <Json, Yaml, Toml>"),
+                    String::from("Enum <Json, Yaml, Toml, Xml>"),
                     String::from("deserialize, 1st argument"),
                     fst_pos,
                     RichTerm {
@@ -1876,6 +1877,13 @@ fn process_binary_operation(
                         "Toml" => toml::from_str(&s).map_err(|err| {
                             EvalError::DeserializationError(
                                 String::from("toml"),
+                                format!("{}", err),
+                                pos_op,
+                            )
+                        })?,
+                        "Xml" => serde_xml_rs::from_str(&s).map_err(|err| {
+                            EvalError::DeserializationError(
+                                String::from("xml"),
                                 format!("{}", err),
                                 pos_op,
                             )
